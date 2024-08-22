@@ -49,6 +49,17 @@ def lecturaArchivo():
 def escrituraArchivo():
     return
 
+def imprimir_menu():
+    print("="*30)
+    print("        MENÚ PRINCIPAL")
+    print("="*30)
+    print("1. Reservar Turno")
+    print("2. Modificar Turno")
+    print("3. Cancelar Turno")
+    print("4. Ver Turnos")
+    print("5. Salir")
+    print("="*30)
+
 
 #----------------------------------------------------------------------------------------------
 # CUERPO PRINCIPAL
@@ -63,11 +74,8 @@ def escrituraArchivo():
 #----------------------------------------------------------------------------------------------
 
 while True:
-    print("1. Reservar Turno")
-    print("2. Modificar Turno")
-    print("3. Cancelar Turno")
-    print("4. Ver Turnos")
-    print("5. Salir")
+    
+    imprimir_menu()
 
     try:
         opcion = int(input("Seleccione una opción: "))
