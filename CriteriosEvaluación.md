@@ -1,11 +1,11 @@
 Criterio de evaluacion: Se evaluaran los siguientes aspectos:
-  . Fidelidad respecto a lo solicitado
-  . Funcionamiento del programa
-  . Técnicas de programación
-  . Prolijidad del codigo y de la interfaz de usuario
-  . La calificación final recibida por cada integrante dependera no solo del trabajo
+  - Fidelidad respecto a lo solicitado
+  - Funcionamiento del programa
+  - Técnicas de programación
+  - Prolijidad del codigo y de la interfaz de usuario
+  - La calificación final recibida por cada integrante dependera no solo del trabajo
   presentado sino tambien de la defensa ejercida.
-  . El desarrollo podrá llevarse a cabo durante el tiempo de clase dedicado a la ejer-
+  - El desarrollo podrá llevarse a cabo durante el tiempo de clase dedicado a la ejer-
   citacion o fuera del horario de la misma.
 
 Objetivo: El Trabajo Practico consistira en el desarrollo de un programa Python que
