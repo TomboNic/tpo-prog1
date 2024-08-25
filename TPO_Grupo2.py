@@ -40,9 +40,6 @@ def cancelarTurno():
 def verTurnos():
     return
 
-def escribirArchivo():
-    return
-
 def lecturaArchivo():
     return
 
