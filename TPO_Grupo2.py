@@ -6,7 +6,7 @@ Fecha: 22/08/2024
 
 Autores: Nicolas Tombolan, Nicolas Bermudez, Valentina Segovia, Mariano Sanabria.
 
-Descripción: 
+Descripción:
 
 Implementar un sistema que gestione la reserva de turnos medicos para los profe-
 sionales de las distintas especialidades que atiende un centro de salud, utilizando
@@ -27,46 +27,93 @@ import csv
 # FUNCIONES
 #----------------------------------------------------------------------------------------------
 
+def reservarTurno():
+    imprimirMenuEspecialidades()
+    especialidad_idx = int(input("Seleccione una especialidad (número): ")) - 1
 
-def reservar_turno():
-    especialidad = especialidades[imprimir_menu_especialidades() - 1]
-    imprimir_dias_y_horarios(especialidad)
-    
+    if especialidad_idx < 0 or especialidad_idx >= len(especialidades):
+        print("Índice de especialidad no válido.")
+        return
+
+    imprimirDiasYHorarios(especialidad_idx)
     dia = input("Ingrese el día para la reserva: ").capitalize()
-    turno = input("Ingrese el turno para la reserva (ej. 09:00): ")
-    
-    if especialidad in horariosDisponibles:
-        if dia in horariosDisponibles[especialidad]:
-            if turno in horariosDisponibles[especialidad][dia]:
-                if horariosDisponibles[especialidad][dia][turno]:
-                    horariosDisponibles[especialidad][dia][turno] = False
-                    print(f"Turno reservado para {especialidad} en {dia} a las {turno}.")
-                else:
-                    print("El turno ya está reservado.")
-            else:
-                print("Turno no disponible.")
-        else:
-            print("Día no disponible.")
+    horario = input("Ingrese el turno para la reserva (ej. 09:00): ")
+
+    if dia not in dias:
+        print("Día no válido.")
+        return
+
+    dia_idx = dias.index(dia)
+    horarios_disponibles = horarios[especialidad_idx]
+    horarios_reservados = []
+
+    if especialidad_idx < len(reservas) and dia_idx < len(reservas[especialidad_idx]):
+        horarios_reservados = [turno[0] for turno in reservas[especialidad_idx][dia_idx]]
+
+    horarios_actualizados = [h for h in horarios_disponibles if h not in horarios_reservados]
+
+    if horario in horarios_actualizados:
+        print("Ingrese los datos del paciente:")
+        nombre = input("Nombre: ")
+        telefono = input("Teléfono: ")
+        email = input("Email: ")
+
+        while len(reservas) <= especialidad_idx:
+            reservas.append([])
+        while len(reservas[especialidad_idx]) <= dia_idx:
+            reservas[especialidad_idx].append([])
+
+        reservas[especialidad_idx][dia_idx].append((horario, nombre, telefono, email))
+        print("Reserva realizada con éxito.")
     else:
-        print("Especialidad no encontrada.")
+        print("Horario no disponible.")
+
+def imprimirDiasYHorarios(especialidad_idx):
+    if especialidad_idx < 0 or especialidad_idx >= len(especialidades):
+        print("Índice de especialidad no válido.")
+        return
+
+    print(f"\nHorarios Disponibles para {especialidades[especialidad_idx]}")
+    print("="*50)
+
+    for dia_idx, dia in enumerate(dias):
+        print(f"{dia.ljust(10)} | ", end="")
+        if especialidad_idx < len(horarios) and dia_idx < len(horarios[especialidad_idx]):
+            horarios_del_dia = horarios[especialidad_idx]
+            horarios_reservados = []
+            if especialidad_idx < len(reservas) and dia_idx < len(reservas[especialidad_idx]):
+                horarios_reservados = [turno[0] for turno in reservas[especialidad_idx][dia_idx]]
+            horarios_actualizados = [h for h in horarios_del_dia if h not in horarios_reservados]
+            print(", ".join(horarios_actualizados))
+        else:
+            print("Error: No disponible.")
+
+    print("="*50)
 
 
-def modificar_turno():
-    return
 
-def cancelar_turno():
-    return
+def modificarTurno():
+    pass
 
-def imprimir_turnos():
-    return
+def cancelarTurno():
+    pass
 
-def lectura_archivo():
-    return
+def imprimirTurnos():
+    print("="*50)
+    print("    Turnos Reservados")
+    print("="*50)
+    if reservas:
+        for especialidad_idx, dias_reservas in enumerate(reservas):
+            for dia_idx, turnos in enumerate(dias_reservas):
+                for turno in turnos:
+                    horario, nombre, telefono, email = turno
+                    print(f"{especialidades[especialidad_idx].ljust(12)} | {dias[dia_idx].ljust(8)} | {horario.ljust(5)} | {nombre.ljust(15)} | {telefono.ljust(15)} | {email}")
+    else:
+        print("No hay turnos reservados.")
+    print("="*50)
 
-def escritura_archivo():
-    return
 
-def imprimir_menu():
+def imprimirMenu():
     print("="*30)
     print("        MENÚ PRINCIPAL")
     print("="*30)
@@ -77,7 +124,8 @@ def imprimir_menu():
     print("5. Salir")
     print("="*30)
 
-def imprimir_menu_especialidades():
+
+def imprimirMenuEspecialidades():
     print("="*30)
     print("     MENÚ DE ESPECIALIDADES MÉDICAS")
     print("="*30)
@@ -87,106 +135,55 @@ def imprimir_menu_especialidades():
     print("4. Ginecología")
     print("5. Ortopedia")
     print("="*30)
-    opcion = int(input())
-    return opcion
-
-def imprimir_dias_y_horarios(especialidad):
-    if especialidad in horariosDisponibles:
-        print("="*30)
-        print(f"    Horarios Disponibles para {especialidad}")
-        print("="*30)
-        for dia, turnos in horariosDisponibles[especialidad].items():
-            print(f"{dia}:")
-            for turno, disponible in turnos.items():
-                if disponible:
-                    print(f"  {turno}")
-        print("="*30)
-    else:
-        print("Especialidad no encontrada.")
-
-def imprimir_menu_especialidades():
-    print("="*30)
-    print("     MENÚ DE ESPECIALIDADES MÉDICAS")
-    print("="*30)
-    for i, esp in enumerate(especialidades, 1):
-        print(f"{i}. {esp}")
-    print("="*30)
-    opcion = int(input("Seleccione una especialidad: "))
-    return opcion
-
-
+1
 #----------------------------------------------------------------------------------------------
 # CUERPO PRINCIPAL
 #----------------------------------------------------------------------------------------------
 # Declaración de variables
 
-
-reservas = []
 especialidades = ["Cardiología", "Dermatología", "Pediatría", "Ginecología", "Ortopedia"]
 
-horariosDisponibles = {
-    "Cardiología": {
-        "Lunes": {"09:00": True, "09:30": True, "10:00": True, "10:30": True, "11:00": True, "11:30": True},
-        "Martes": {"14:00": True, "14:30": True, "15:00": True, "15:30": True, "16:00": True},
-        "Miércoles": {"09:00": True, "09:30": True, "10:00": True, "10:30": True, "11:00": True},
-        "Jueves": {"14:00": True, "14:30": True, "15:00": True, "15:30": True, "16:00": True},
-        "Viernes": {"09:00": True, "09:30": True, "10:00": True, "10:30": True, "11:00": True}
-    },
-    "Dermatología": {
-        "Lunes": {"10:00": True, "10:30": True, "11:00": True, "11:30": True, "12:00": True},
-        "Martes": {"15:00": True, "15:30": True, "16:00": True, "16:30": True, "17:00": True},
-        "Miércoles": {"10:00": True, "10:30": True, "11:00": True, "11:30": True, "12:00": True},
-        "Jueves": {"15:00": True, "15:30": True, "16:00": True, "16:30": True, "17:00": True},
-        "Viernes": {"10:00": True, "10:30": True, "11:00": True, "11:30": True, "12:00": True}
-    },
-    "Pediatría": {
-        "Lunes": {"08:00": True, "08:30": True, "09:00": True, "09:30": True, "10:00": True},
-        "Martes": {"13:00": True, "13:30": True, "14:00": True, "14:30": True, "15:00": True},
-        "Miercoles": {"08:00": True, "08:30": True, "09:00": True, "09:30": True, "10:00": True},
-        "Jueves": {"13:00": True, "13:30": True, "14:00": True, "14:30": True, "15:00": True},
-        "Viernes": {"08:00": True, "08:30": True, "09:00": True, "09:30": True, "10:00": True}
-    },
-    "Ginecología": {
-        "Lunes": {"09:00": True, "09:30": True, "10:00": True, "10:30": True, "11:00": True},
-        "Martes": {"14:00": True, "14:30": True, "15:00": True, "15:30": True, "16:00": True},
-        "Miércoles": {"09:00": True, "09:30": True, "10:00": True, "10:30": True, "11:00": True},
-        "Jueves": {"14:00": True, "14:30": True, "15:00": True, "15:30": True, "16:00": True},
-        "Viernes": {"09:00": True, "09:30": True, "10:00": True, "10:30": True, "11:00": True}
-    },
-    "Ortopedia": {
-        "Lunes": {"11:00": True, "11:30": True, "12:00": True, "12:30": True, "13:00": True},
-        "Martes": {"16:00": True, "16:30": True, "17:00": True, "17:30": True, "18:00": True},
-        "Miércoles": {"11:00": True, "11:30": True, "12:00": True, "12:30": True, "13:00": True},
-        "Jueves": {"16:00": True, "16:30": True, "17:00": True, "17:30": True, "18:00": True},
-        "viernes": {"16:00": True, "16:30": True, "17:00": True, "17:30": True, "18:00": True}
-    }
-}
+dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
 
+horarios = [
+    ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"],  # Cardiología
+    ["10:00", "10:30", "11:00", "11:30", "12:00"],           # Dermatología
+    ["08:00", "08:30", "09:00", "09:30", "10:00"],           # Pediatría
+    ["09:00", "09:30", "10:00", "10:30", "11:00"],           # Ginecología
+    ["11:00", "11:30", "12:00", "12:30", "13:00"]            # Ortopedia
+]
 
+disponibilidad = [
+    [True, True, True, True, True, True],   # Cardiología
+    [True, True, True, True, True],         # Dermatología
+    [True, True, True, True, True],         # Pediatría
+    [True, True, True, True, True],         # Ginecología
+    [True, True, True, True, True]          # Ortopedia
+]
+
+reservas = []
 
 #----------------------------------------------------------------------------------------------
 # MENU PRINCIPAL
 #----------------------------------------------------------------------------------------------
 
 while True:
-    
-    imprimir_menu()
+
+    imprimirMenu()
 
     try:
         opcion = int(input("Seleccione una opción: "))
         if opcion == 1:
-            reservar_turno()
+            reservarTurno()
         elif opcion == 2:
-            modificar_turno()
+            modificarTurno()
         elif opcion == 3:
-            cancelar_turno()
+            cancelarTurno()
         elif opcion == 4:
-            imprimir_turnos()
+            imprimirTurnos()
         elif opcion == 5:
             break
         else:
             print("Opción inválida.")
     except Exception as e:
         print(f"Error: {e}")
-
-
