@@ -1,26 +1,3 @@
-
-"""
------------------------------------------------------------------------------------------------
-Título: Gestor de Turnos Médicos V1.0
-
-Fecha: 22/08/2024
-
-Autores: Nicolas Tombolan, Nicolas Bermudez, Valentina Segovia, Mariano Sanabria.
-
-Descripción:
-
-Implementar un sistema que gestione la reserva de turnos médicos para los profe-
-sionales de las distintas especialidades que atiende un centro de salud, utilizando
-matrices, listas y diccionarios para mantener la información, almacenándola en ar-
-chivos para permitir su posterior recuperación. Aplicar GIT para control de versiones
-y recursividad para realizar las búsquedas.
------------------------------------------------------------------------------------------------
-"""
-
-# ----------------------------------------------------------------------------------------------
-# MÓDULOS IMPORTADOS
-# ----------------------------------------------------------------------------------------------
-
 import os
 import csv
 
@@ -61,13 +38,14 @@ def seleccionarEspecialidad():
     """
     imprimirMenuEspecialidades()
     indice_especialidad = int(input("\nSeleccione una especialidad (número): ")) - 1
-    if indice_especialidad < 0 or indice_especialidad >= len(especialidades):
+    if indice_especialidad < 0 or indice_especialidad >= len(especialidades): # arreglar comparacion <= 0 or 
         print("\nÍndice de especialidad no válido.\n")
         return None
     return indice_especialidad
 
 
 def imprimirDias():
+
     """
     Imprime los días de la semana disponibles para las reservas.
     """
@@ -78,7 +56,7 @@ def imprimirDias():
 
 
 
-def seleccionarDia():
+def seleccionarDia(): # revisar
     """
     Solicita al usuario seleccionar un día para la reserva.
 
@@ -92,28 +70,26 @@ def seleccionarDia():
     return indice_dia
 
 
-def imprimirHorariosDisponibles(indice_especialidad, indice_dia):
+def imprimirHorariosDisponibles(indice_especialidad, indice_dia):  # no se usa 
     """
     Imprime los horarios disponibles para una especialidad y día seleccionados.
     """
-    if indice_especialidad < len(especialidades) and indice_dia < len(dias):
-        print(f"\nHorarios disponibles para {especialidades[indice_especialidad]} el {dias[indice_dia]}:")
-        horarios_disponibles = horarios[indice_especialidad]
-        horarios_reservados = reservas[indice_especialidad][indice_dia]
-
-        horarios_actualizados = [h for i, h in enumerate(horarios_disponibles) if horarios_reservados[i] == ""]
-
-        if horarios_actualizados:
-            for i, horario in enumerate(horarios_actualizados, start=1):
-                print(f"{i}. {horario}")
-        else:
-            print("No hay horarios disponibles.")
-    else:
-        print("Error: Datos inválidos.")
-    print()
+    
+    print(f"\nHorarios disponibles para {especialidades[indice_especialidad]} el {dias[indice_dia]}:")
+    horarios_disponibles = horarios[indice_especialidad] # se queda con los horarios para la especialidad
+    horarios_reservados = reservas[indice_especialidad][indice_dia] # se qeuda con los horarios libres o no de la esp del dia 
 
 
-def seleccionarHorario(indice_especialidad, indice_dia):
+    for i, horario in enumerate(horarios_disponibles, start=1):
+          if horarios_reservados[i - 1] == "": # Se ve si el horario esta libre o no, el i - 1 es por el start = 1, de lo contrario es index out of range
+             print(f"{i}. {horario}")
+          else:
+             print(f"{i}. {horario} OCUPADO")
+          
+
+
+
+def seleccionarHorario(indice_especialidad, indice_dia):  # indice dia no se usa, para todos los dias hay los mismos horarios 
     """
     Solicita al usuario seleccionar un horario para la reserva de acuerdo a la especialidad y día seleccionados.
 
@@ -121,7 +97,7 @@ def seleccionarHorario(indice_especialidad, indice_dia):
     """
     imprimirHorariosDisponibles(indice_especialidad, indice_dia)
     indice_horario = int(input("\nSeleccione un horario (número): ")) - 1
-    if indice_horario < 0 or indice_horario >= len(horarios[indice_especialidad]):
+    if indice_horario < 0 or indice_horario >= len(horarios[indice_especialidad]): # comparacion, el index debe estar entre 0 y 4
         print("\nÍndice de horario no válido.\n")
         return None
     return indice_horario
@@ -157,8 +133,8 @@ def registrarReserva(indice_especialidad, indice_dia, indice_horario, nombre, te
     """
     reservas[indice_especialidad][indice_dia][indice_horario] = f"{nombre}, {telefono}, {email}"
 
-
-def imprimirDiasYHorarios(indice_especialidad):
+ 
+def imprimirDiasYHorarios(indice_especialidad): # no se usa 
     """
     Esta función muestra los días de la semana y, para cada día, imprime los horarios disponibles
     de acuerdo a la especialidad seleccionada. Si un horario ya ha sido reservado, no se muestra
@@ -258,12 +234,129 @@ def imprimirMenuEspecialidades():
     print("=" * 30)
 
 
-def modificarTurno():
-    pass
+def modificarTurno_eliminarTurno(opcion):   
+    print("=" * 30)
+    print("Datos del turno vigente:")
+    print("=" * 30)
+    indice_especialidad = seleccionarEspecialidad() 
+    if indice_especialidad is None:
+        return
+    indice_dia = seleccionarDia()
+    if indice_dia is None:
+        return
+    indice_horario = seleccionarHorario(indice_especialidad, indice_dia)
+    if indice_horario is None:
+        return
+    
+    turno_actual = reservas[indice_especialidad][indice_dia][indice_horario]  # Se traen los datos del turno solicitado
+    if not turno_actual:
+        print("\nNo hay un turno reservado en este horario.\n")  
+        return
+
+    nombre_actual, telefono_actual, email_actual = turno_actual.split(", ")  
+    nombre, telefono, email = solicitarDatosPaciente()
+
+    if nombre == nombre_actual and telefono == telefono_actual and email == email_actual:  
+        print("=" * 30)
+        print("TURNO ENCONTRADO CON ÉXITO")
+        print("=" * 30)  
+        
+        if opcion == 3:
+            cancelarTurno(indice_especialidad, indice_dia, indice_horario)
+            print("\nTurno cancelado con éxito.\n")  
+            return
+        
+        else:
+            print("=" * 30)
+            print("Datos para modificar tu turno:")
+            print("=" * 30)
+            indice_dia_nuevo = seleccionarDia()
+            if indice_dia_nuevo is None:
+                return
+            indice_horario_nuevo = seleccionarHorario(indice_especialidad, indice_dia_nuevo)
+            if indice_horario_nuevo is None:
+                return
+            
+            # Depuración: Verificar valores
+            print(f"Verificando disponibilidad: especialidad={indice_especialidad}, dia={indice_dia_nuevo}, horario={indice_horario_nuevo}")
+            
+            if reservas[indice_especialidad][indice_dia_nuevo][indice_horario_nuevo] == "":
+                cancelarTurno(indice_especialidad, indice_dia, indice_horario)
+                nombre_nuevo, telefono_nuevo, email_nuevo = solicitarDatosPaciente()
+                registrarReserva(indice_especialidad, indice_dia_nuevo, indice_horario_nuevo, nombre_nuevo, telefono_nuevo, email_nuevo)
+                print("Turno agendado con éxito.")
+                return
+            
+            print("Turno ocupado, vuelva a solicitar otro distinto.")
+            return
+    
+    else: 
+        print("\nEste turno no es suyo.\n")  
+    """
+      Chequeamos que esos datos hacen match con el los datos del turno proporcionado
+    """
+    print("=" * 30)
+    print("Datos del turno a vigente:")
+    print("=" * 30)
+    indice_especialidad = seleccionarEspecialidad() 
+    if indice_especialidad  is None:
+         return
+    indice_dia = seleccionarDia()
+    if indice_dia is None:
+        return
+    indice_horario = seleccionarHorario(indice_especialidad, indice_dia)
+    if indice_horario is None:
+        return
+    nombre, telefono, email = solicitarDatosPaciente()
+    turno_actual = reservas[indice_especialidad][indice_dia][indice_horario] # Se traen los datos del turno solcitado
+    if not turno_actual:
+        print("\nNo hay un turno reservado en este horario.\n")  
+        return
+    nombre_actual, telefono_actual, email_actual = turno_actual.split(", ")  
+    if nombre == nombre_actual and telefono == telefono_actual and email == email_actual:  
+        # Actualizar datos si hacen match
+        print("=" * 30)
+        print("TURNO ENCONTRADO CON EXITO")
+        print("=" * 30)  
+        if opcion == 4:
+           cancelarTurno(indice_especialidad, indice_dia, indice_horario)
+           print("\nTurno cancelado con exito.\n")  
+           return
+        else:
+            """
+            Se vuelven a pedir los datos pero esta vez del nuevo turno a agendar
+            
+            """
+            print("=" * 30)
+            print("Datos para modificar de tu turno:")
+            print("=" * 30)
+            indice_dia_nuevo = seleccionarDia()
+            if indice_dia_nuevo is None:
+                return
+            indice_horario_nuevo = seleccionarHorario(indice_especialidad, indice_dia_nuevo)
+            if indice_horario_nuevo is None:
+                return
+            nombre_nuevo, telefono_nuevo, email_nuevo = solicitarDatosPaciente()
+            if reservas[indice_especialidad][indice_dia_nuevo][indice_horario_nuevo] is None:
+                """
+                Turno libre, agendamos al cliente
+                """
+                cancelarTurno(indice_especialidad, indice_dia, indice_horario)
+                registrarReserva(indice_especialidad, indice_dia_nuevo, indice_horario_nuevo, nombre_nuevo, telefono_nuevo, email_nuevo)
+                print("Turno agendado con exito")
+                return
+            print("Turno ocupado, vuelva a solicitar otro distinto")
+            return
+    else: 
+         print("\nEste turno no es suyo.\n")  
 
 
-def cancelarTurno():
-    pass
+     
+
+
+def cancelarTurno(indice_especialidad, indice_dia, indice_horario): # se debe usar solo si se sabe que hay un turno en esos indices determinados
+    reservas[indice_especialidad][indice_dia][indice_horario] = "" 
+    
 
 
 # ----------------------------------------------------------------------------------------------
@@ -276,11 +369,11 @@ especialidades = ["Cardiología", "Dermatología", "Pediatría", "Ginecología",
 dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
 
 horarios = [
-    ["09:00", "09:30", "10:00", "10:30", "11:00"],  # Cardiología
+    ["09:00", "09:30", "10:00", "10:30", "11:00"],  # Cardiología   
     ["10:00", "10:30", "11:00", "11:30", "12:00"],  # Dermatología
     ["08:00", "08:30", "09:00", "09:30", "10:00"],  # Pediatría
     ["09:00", "09:30", "10:00", "10:30", "11:00"],  # Ginecología
-    ["11:00", "11:30", "12:00", "12:30", "13:00"]  # Ortopedia
+    ["11:00", "11:30", "12:00", "12:30", "13:00"]  # Ortopedia  
 ]
 
 disponibilidad = [
@@ -291,8 +384,17 @@ disponibilidad = [
     [True, True, True, True, True]  # Ortopedia
 ]
 
-reservas = [[["" for _ in range(len(horarios[especialidad]))] for _ in range(len(dias))] for especialidad in
-            range(len(especialidades))]
+reservas = [    
+             [
+                 
+                 ["" for _ in range(len(horarios[especialidad]))] for _ in range(len(dias)) # lista por comprension
+                 
+                 
+             ] 
+                    for especialidad in         # lista por comprension
+                    range(len(especialidades))
+             
+            ]
 
 # ----------------------------------------------------------------------------------------------
 # MENÚ PRINCIPAL
@@ -306,10 +408,8 @@ while True:
         opcion = int(input("\nSeleccione una opción: "))
         if opcion == 1:
             reservarTurno()
-        elif opcion == 2:
-            modificarTurno()
-        elif opcion == 3:
-            cancelarTurno()
+        elif opcion == 2 or  opcion == 3:
+            modificarTurno_eliminarTurno(opcion)
         elif opcion == 4:
             imprimirTurnos()
         elif opcion == 5:
