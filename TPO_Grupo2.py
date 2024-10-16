@@ -1,6 +1,6 @@
-import os
-import csv
-
+#import os
+#import csv
+#Modulo CSV no aporta funcionalidad adicional al programa
 
 # ----------------------------------------------------------------------------------------------
 # FUNCIONES
